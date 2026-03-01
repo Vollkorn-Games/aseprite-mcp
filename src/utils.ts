@@ -24,6 +24,31 @@ export const PARAMETER_MAPPINGS: Record<string, string> = {
   data_path: "dataPath",
   ani_dir: "aniDir",
   flip_type: "flipType",
+  // Round 2 — Advanced Drawing
+  image_path: "imagePath",
+  center_x: "centerX",
+  center_y: "centerY",
+  from_color: "fromColor",
+  to_color: "toColor",
+  // Round 3 — Animation Workflow
+  source_frame: "sourceFrame",
+  source_layer: "sourceLayer",
+  dest_frame: "destFrame",
+  dest_layer: "destLayer",
+  // Round 4 — Tileset & Tilemap
+  tile_width: "tileWidth",
+  tile_height: "tileHeight",
+  tile_index: "tileIndex",
+  // Round 5 — Batch Operations
+  output_pattern: "outputPattern",
+  input_paths: "inputPaths",
+  output_dir: "outputDir",
+  frame_width: "frameWidth",
+  frame_height: "frameHeight",
+  // Round 6 — Color & Analysis
+  max_colors: "maxColors",
+  keep_rgb: "keepRgb",
+  palette_start: "paletteStart",
 };
 
 export const REVERSE_PARAMETER_MAPPINGS: Record<string, string> = {};

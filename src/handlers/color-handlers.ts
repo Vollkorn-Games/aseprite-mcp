@@ -7,91 +7,7 @@ import {
 } from "../utils.js";
 import { executeOperation } from "../aseprite-executor.js";
 
-export async function handleCreateTag(
-  ctx: ServerContext,
-  args: any,
-): Promise<ToolResponse> {
-  args = normalizeParameters(args);
-
-  if (!args.inputPath) {
-    return createErrorResponse("Missing required parameter: inputPath", [
-      "Provide the absolute path to the sprite file",
-    ]);
-  }
-
-  if (!args.name) {
-    return createErrorResponse("Missing required parameter: name", [
-      "Provide a name for the animation tag (e.g. 'idle', 'walk')",
-    ]);
-  }
-
-  if (!validatePath(args.inputPath)) {
-    return createErrorResponse("Invalid path", [
-      'Provide a valid path without ".."',
-    ]);
-  }
-
-  try {
-    const { stdout } = await executeOperation(ctx, "create_tag", {
-      inputPath: args.inputPath,
-      name: args.name,
-      fromFrame: args.fromFrame,
-      toFrame: args.toFrame,
-      color: args.color,
-      aniDir: args.aniDir,
-      outputPath: args.outputPath,
-    });
-
-    return { content: [{ type: "text", text: stdout }] };
-  } catch (error: any) {
-    return createErrorResponse(
-      `Failed to create tag: ${error?.message ?? "Unknown error"}`,
-      ["Ensure the frame range is valid"],
-    );
-  }
-}
-
-export async function handleRemoveTag(
-  ctx: ServerContext,
-  args: any,
-): Promise<ToolResponse> {
-  args = normalizeParameters(args);
-
-  if (!args.inputPath) {
-    return createErrorResponse("Missing required parameter: inputPath", [
-      "Provide the absolute path to the sprite file",
-    ]);
-  }
-
-  if (!args.tagName) {
-    return createErrorResponse("Missing required parameter: tagName", [
-      "Provide the name of the tag to remove",
-    ]);
-  }
-
-  if (!validatePath(args.inputPath)) {
-    return createErrorResponse("Invalid path", [
-      'Provide a valid path without ".."',
-    ]);
-  }
-
-  try {
-    const { stdout } = await executeOperation(ctx, "remove_tag", {
-      inputPath: args.inputPath,
-      tagName: args.tagName,
-      outputPath: args.outputPath,
-    });
-
-    return { content: [{ type: "text", text: stdout }] };
-  } catch (error: any) {
-    return createErrorResponse(
-      `Failed to remove tag: ${error?.message ?? "Unknown error"}`,
-      ["Ensure a tag with this name exists in the sprite"],
-    );
-  }
-}
-
-export async function handleListTags(
+export async function handleAnalyzeColors(
   ctx: ServerContext,
   args: any,
 ): Promise<ToolResponse> {
@@ -110,20 +26,21 @@ export async function handleListTags(
   }
 
   try {
-    const { stdout } = await executeOperation(ctx, "list_tags", {
+    const { stdout } = await executeOperation(ctx, "analyze_colors", {
       inputPath: args.inputPath,
+      frameNumber: args.frameNumber,
     });
 
     return { content: [{ type: "text", text: stdout }] };
   } catch (error: any) {
     return createErrorResponse(
-      `Failed to list tags: ${error?.message ?? "Unknown error"}`,
+      `Failed to analyze colors: ${error?.message ?? "Unknown error"}`,
       ["Ensure the sprite file exists and is valid"],
     );
   }
 }
 
-export async function handleSetTagProperties(
+export async function handleQuantizeColors(
   ctx: ServerContext,
   args: any,
 ): Promise<ToolResponse> {
@@ -135,9 +52,9 @@ export async function handleSetTagProperties(
     ]);
   }
 
-  if (!args.tagName) {
-    return createErrorResponse("Missing required parameter: tagName", [
-      "Provide the name of the tag to modify",
+  if (args.maxColors == null) {
+    return createErrorResponse("Missing required parameter: maxColors", [
+      "Provide the maximum number of colors",
     ]);
   }
 
@@ -148,21 +65,96 @@ export async function handleSetTagProperties(
   }
 
   try {
-    const { stdout } = await executeOperation(ctx, "set_tag_properties", {
+    const { stdout } = await executeOperation(ctx, "quantize_colors", {
       inputPath: args.inputPath,
-      tagName: args.tagName,
-      name: args.name,
-      color: args.color,
-      aniDir: args.aniDir,
-      repeats: args.repeats,
+      maxColors: args.maxColors,
+      dithering: args.dithering,
+      keepRgb: args.keepRgb,
       outputPath: args.outputPath,
     });
 
     return { content: [{ type: "text", text: stdout }] };
   } catch (error: any) {
     return createErrorResponse(
-      `Failed to set tag properties: ${error?.message ?? "Unknown error"}`,
-      ["Ensure a tag with this name exists in the sprite"],
+      `Failed to quantize colors: ${error?.message ?? "Unknown error"}`,
+      ["Ensure the sprite file exists"],
+    );
+  }
+}
+
+export async function handleGeneratePalette(
+  ctx: ServerContext,
+  args: any,
+): Promise<ToolResponse> {
+  args = normalizeParameters(args);
+
+  if (!args.inputPath) {
+    return createErrorResponse("Missing required parameter: inputPath", [
+      "Provide the absolute path to the sprite file",
+    ]);
+  }
+
+  if (!validatePath(args.inputPath)) {
+    return createErrorResponse("Invalid path", [
+      'Provide a valid path without ".."',
+    ]);
+  }
+
+  try {
+    const { stdout } = await executeOperation(ctx, "generate_palette", {
+      inputPath: args.inputPath,
+      maxColors: args.maxColors,
+      outputPath: args.outputPath,
+    });
+
+    return { content: [{ type: "text", text: stdout }] };
+  } catch (error: any) {
+    return createErrorResponse(
+      `Failed to generate palette: ${error?.message ?? "Unknown error"}`,
+      ["Ensure the sprite file exists and has pixel content"],
+    );
+  }
+}
+
+export async function handleColorRamp(
+  ctx: ServerContext,
+  args: any,
+): Promise<ToolResponse> {
+  args = normalizeParameters(args);
+
+  if (!args.fromColor) {
+    return createErrorResponse("Missing required parameter: fromColor", [
+      'Provide the start color as hex string (e.g. "#000000")',
+    ]);
+  }
+
+  if (!args.toColor) {
+    return createErrorResponse("Missing required parameter: toColor", [
+      'Provide the end color as hex string (e.g. "#ffffff")',
+    ]);
+  }
+
+  if (args.inputPath && !validatePath(args.inputPath)) {
+    return createErrorResponse("Invalid path", [
+      'Provide a valid path without ".."',
+    ]);
+  }
+
+  try {
+    const { stdout } = await executeOperation(ctx, "color_ramp", {
+      fromColor: args.fromColor,
+      toColor: args.toColor,
+      steps: args.steps,
+      inputPath: args.inputPath,
+      paletteStart: args.paletteStart,
+      outputPath: args.outputPath,
+    });
+
+    return { content: [{ type: "text", text: stdout }] };
+  } catch (error: any) {
+    return createErrorResponse(
+      `Failed to generate color ramp: ${error?.message ?? "Unknown error"}`,
+      ["Ensure colors are valid hex strings"],
     );
   }
 }

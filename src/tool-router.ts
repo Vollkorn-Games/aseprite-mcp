@@ -18,6 +18,9 @@ import * as transformHandlers from "./handlers/transform-handlers.js";
 import * as tagHandlers from "./handlers/tag-handlers.js";
 import * as exportHandlers from "./handlers/export-handlers.js";
 import * as celHandlers from "./handlers/cel-handlers.js";
+import * as tilemapHandlers from "./handlers/tilemap-handlers.js";
+import * as batchHandlers from "./handlers/batch-handlers.js";
+import * as colorHandlers from "./handlers/color-handlers.js";
 
 type HandlerFn = (ctx: ServerContext, args: any) => any;
 
@@ -42,6 +45,7 @@ const HANDLER_MAP: Record<string, HandlerFn> = {
   set_frame_duration: frameHandlers.handleSetFrameDuration,
   list_frames: frameHandlers.handleListFrames,
   reorder_frames: frameHandlers.handleReorderFrames,
+  duplicate_frame: frameHandlers.handleDuplicateFrame,
 
   // Drawing operations
   draw_pixel: drawingHandlers.handleDrawPixel,
@@ -50,6 +54,10 @@ const HANDLER_MAP: Record<string, HandlerFn> = {
   draw_rect: drawingHandlers.handleDrawRect,
   draw_ellipse: drawingHandlers.handleDrawEllipse,
   flood_fill: drawingHandlers.handleFloodFill,
+  draw_image: drawingHandlers.handleDrawImage,
+  draw_circle: drawingHandlers.handleDrawCircle,
+  replace_color: drawingHandlers.handleReplaceColor,
+  outline: drawingHandlers.handleOutline,
 
   // Palette management
   get_palette: paletteHandlers.handleGetPalette,
@@ -74,6 +82,7 @@ const HANDLER_MAP: Record<string, HandlerFn> = {
   create_tag: tagHandlers.handleCreateTag,
   remove_tag: tagHandlers.handleRemoveTag,
   list_tags: tagHandlers.handleListTags,
+  set_tag_properties: tagHandlers.handleSetTagProperties,
 
   // Export operations
   export_png: exportHandlers.handleExportPng,
@@ -83,6 +92,23 @@ const HANDLER_MAP: Record<string, HandlerFn> = {
   // Cel operations
   clear_cel: celHandlers.handleClearCel,
   get_cel_info: celHandlers.handleGetCelInfo,
+  copy_cel: celHandlers.handleCopyCel,
+
+  // Tilemap operations
+  create_tilemap_layer: tilemapHandlers.handleCreateTilemapLayer,
+  set_tile: tilemapHandlers.handleSetTile,
+  get_tileset_info: tilemapHandlers.handleGetTilesetInfo,
+
+  // Batch operations
+  batch_export: batchHandlers.handleBatchExport,
+  batch_resize: batchHandlers.handleBatchResize,
+  import_spritesheet: batchHandlers.handleImportSpritesheet,
+
+  // Color & analysis
+  analyze_colors: colorHandlers.handleAnalyzeColors,
+  quantize_colors: colorHandlers.handleQuantizeColors,
+  generate_palette: colorHandlers.handleGeneratePalette,
+  color_ramp: colorHandlers.handleColorRamp,
 };
 
 function getActiveTools(ctx: ServerContext): ToolDefinition[] {

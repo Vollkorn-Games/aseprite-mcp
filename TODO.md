@@ -15,39 +15,39 @@
 - [x] **Tool filtering** — MCP_TOOLSETS, MCP_EXCLUDE_TOOLS, MCP_READ_ONLY env vars
 - [x] **Infrastructure** — Modular handler architecture, unit + integration tests, CI pipeline
 
-## Round 2 — Advanced Drawing
+## Round 2 — Advanced Drawing (Done)
 
-- [ ] **`draw_image`** — Paste an external PNG/image onto a layer at a position. Essential for compositing reference art or tilesheet assembly.
-- [ ] **`draw_circle`** — Draw filled/outline circle (convenience wrapper around draw_ellipse with equal radii).
-- [ ] **`draw_text`** — Render text onto a layer using a bitmap font. Useful for UI mockups and sprite labels.
-- [ ] **`replace_color`** — Replace all pixels of one color with another across the sprite or selection.
-- [ ] **`outline`** — Add an outline of a given color around non-transparent pixels. Common pixel art operation.
+- [x] **`draw_image`** — Paste an external PNG/image onto a layer at a position.
+- [x] **`draw_circle`** — Draw filled/outline circle (convenience wrapper around draw_ellipse with equal radii).
+- [x] **`replace_color`** — Replace all pixels of one color with another across the sprite.
+- [x] **`outline`** — Add an outline of a given color around non-transparent pixels.
+- ~~**`draw_text`**~~ — Dropped. Aseprite Lua has no text rendering API in batch mode.
 
-## Round 3 — Animation Workflow
+## Round 3 — Animation Workflow (Done)
 
-- [ ] **`duplicate_frame`** — Clone an existing frame (with all cel content). More explicit than add_frame with duplicate flag.
-- [ ] **`set_tag_properties`** — Modify tag color, animation direction (forward/reverse/ping-pong), repeat count.
-- [ ] **`copy_cel`** — Copy cel content from one frame/layer to another.
-- [ ] **`onion_skin_export`** — Export frames with onion skinning overlay for animation review.
+- [x] **`duplicate_frame`** — Clone an existing frame with all cel content.
+- [x] **`set_tag_properties`** — Modify tag name, color, animation direction, repeat count.
+- [x] **`copy_cel`** — Copy cel content from one frame/layer to another.
+- ~~**`onion_skin_export`**~~ — Dropped. Onion skin is a UI-only feature, not available via scripting.
 
-## Round 4 — Tileset & Tilemap
+## Round 4 — Tileset & Tilemap (Done)
 
-- [ ] **`create_tilemap_layer`** — Create a tilemap layer with a tileset. Aseprite 1.3+ has native tilemap support.
-- [ ] **`set_tile`** — Place a tile at grid coordinates in a tilemap layer.
-- [ ] **`get_tileset_info`** — List tiles in a tileset with dimensions and count.
+- [x] **`create_tilemap_layer`** — Create a tilemap layer with a tileset. Requires Aseprite 1.3+.
+- [x] **`set_tile`** — Place a tile at grid coordinates in a tilemap layer.
+- [x] **`get_tileset_info`** — List tiles in a tileset with dimensions and count.
 
-## Round 5 — Batch Operations
+## Round 5 — Batch Operations (Done)
 
-- [ ] **`batch_export`** — Export multiple frames/layers as individual PNGs with naming patterns.
-- [ ] **`batch_resize`** — Resize multiple sprites at once (useful for generating @1x/@2x/@3x assets).
-- [ ] **`import_spritesheet`** — Import a sprite sheet PNG and split into individual frames.
+- [x] **`batch_export`** — Export multiple frames/layers as individual PNGs with naming patterns.
+- [x] **`batch_resize`** — Resize multiple sprites at once (useful for generating @1x/@2x/@3x assets).
+- [x] **`import_spritesheet`** — Import a sprite sheet PNG and split into individual frames.
 
-## Round 6 — Color & Analysis
+## Round 6 — Color & Analysis (Done)
 
-- [ ] **`analyze_colors`** — Count unique colors, find most/least used colors, detect unused palette entries.
-- [ ] **`quantize_colors`** — Reduce color count to fit a target palette size.
-- [ ] **`generate_palette`** — Auto-generate a palette from sprite colors (median cut, k-means).
-- [ ] **`color_ramp`** — Generate a color ramp between two colors for palette building.
+- [x] **`analyze_colors`** — Count unique colors, find most/least used colors, detect unused palette entries.
+- [x] **`quantize_colors`** — Reduce color count to fit a target palette size.
+- [x] **`generate_palette`** — Auto-generate a palette from sprite colors sorted by frequency.
+- [x] **`color_ramp`** — Generate a color ramp between two colors for palette building.
 
 ## Future Considerations
 

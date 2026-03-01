@@ -185,3 +185,37 @@ export async function handleReorderFrames(
     );
   }
 }
+
+export async function handleDuplicateFrame(
+  ctx: ServerContext,
+  args: any,
+): Promise<ToolResponse> {
+  args = normalizeParameters(args);
+
+  if (!args.inputPath) {
+    return createErrorResponse("Missing required parameter: inputPath", [
+      "Provide the absolute path to the sprite file",
+    ]);
+  }
+
+  if (!validatePath(args.inputPath)) {
+    return createErrorResponse("Invalid path", [
+      'Provide a valid path without ".."',
+    ]);
+  }
+
+  try {
+    const { stdout } = await executeOperation(ctx, "duplicate_frame", {
+      inputPath: args.inputPath,
+      frameNumber: args.frameNumber,
+      outputPath: args.outputPath,
+    });
+
+    return { content: [{ type: "text", text: stdout }] };
+  } catch (error: any) {
+    return createErrorResponse(
+      `Failed to duplicate frame: ${error?.message ?? "Unknown error"}`,
+      ["Ensure the frame number is valid"],
+    );
+  }
+}

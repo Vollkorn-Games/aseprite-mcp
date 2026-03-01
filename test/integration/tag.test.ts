@@ -7,6 +7,7 @@ import { handleAddFrame } from "../../src/handlers/frame-handlers.js";
 import {
   handleCreateTag,
   handleListTags,
+  handleSetTagProperties,
 } from "../../src/handlers/tag-handlers.js";
 
 describe("Tag handlers", () => {
@@ -64,6 +65,45 @@ describe("Tag handlers", () => {
     const data = JSON.parse(text);
     expect(data.success).toBe(true);
     expect(data.tags).toBeInstanceOf(Array);
+  });
+
+  it("sets tag properties", async () => {
+    const spritePath = cleanup.track("test_set_tag_props.aseprite");
+    await handleCreateSprite(ctx, {
+      width: 16,
+      height: 16,
+      outputPath: spritePath,
+    });
+    await handleAddFrame(ctx, {
+      inputPath: spritePath,
+      outputPath: spritePath,
+    });
+    await handleCreateTag(ctx, {
+      inputPath: spritePath,
+      name: "walk",
+      fromFrame: 1,
+      toFrame: 2,
+      outputPath: spritePath,
+    });
+
+    const res = await handleSetTagProperties(ctx, {
+      inputPath: spritePath,
+      tagName: "walk",
+      name: "run",
+      aniDir: "pingpong",
+      outputPath: spritePath,
+    });
+    const text = assertSuccess(res);
+    const data = JSON.parse(text);
+    expect(data.success).toBe(true);
+    expect(data.tagName).toBe("run");
+  });
+
+  it("returns error for missing tag name on set_tag_properties", async () => {
+    const res = await handleSetTagProperties(ctx, {
+      inputPath: "/tmp/test.aseprite",
+    });
+    assertError(res);
   });
 
   it("returns error for missing name", async () => {

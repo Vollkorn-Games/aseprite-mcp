@@ -1227,4 +1227,593 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
       required: ["inputPath"],
     },
   },
+
+  // ── Round 2 — Advanced Drawing ───────────────────────────────
+  {
+    name: "draw_image",
+    category: "drawing",
+    readOnly: false,
+    description:
+      "Paste an external PNG/image onto a layer at a position. Useful for compositing reference art or tileset assembly.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        imagePath: {
+          type: "string",
+          description:
+            "Absolute path to the external image file (PNG) to paste",
+        },
+        x: {
+          type: "number",
+          description: "X position to paste the image (default: 0)",
+        },
+        y: {
+          type: "number",
+          description: "Y position to paste the image (default: 0)",
+        },
+        frameNumber: {
+          type: "number",
+          description: "1-based frame number (default: 1)",
+        },
+        layerIndex: {
+          type: "number",
+          description: "1-based layer index (default: 1)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "imagePath"],
+    },
+  },
+  {
+    name: "draw_circle",
+    category: "drawing",
+    readOnly: false,
+    description:
+      "Draw a circle (filled or outline) at a center point with a given radius.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        centerX: {
+          type: "number",
+          description: "X coordinate of the circle center",
+        },
+        centerY: {
+          type: "number",
+          description: "Y coordinate of the circle center",
+        },
+        radius: {
+          type: "number",
+          description: "Circle radius in pixels",
+        },
+        color: {
+          type: "string",
+          description: 'Circle color as hex string (e.g. "#ff0000")',
+        },
+        filled: {
+          type: "boolean",
+          description: "Whether to fill the circle (default: true)",
+        },
+        brushSize: {
+          type: "number",
+          description: "Brush size in pixels (default: 1)",
+        },
+        frameNumber: {
+          type: "number",
+          description: "1-based frame number (default: 1)",
+        },
+        layerIndex: {
+          type: "number",
+          description: "1-based layer index (default: 1)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "centerX", "centerY", "radius", "color"],
+    },
+  },
+  {
+    name: "replace_color",
+    category: "drawing",
+    readOnly: false,
+    description:
+      "Replace all pixels of one color with another color across the entire sprite.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        fromColor: {
+          type: "string",
+          description: 'Color to replace as hex string (e.g. "#ff0000")',
+        },
+        toColor: {
+          type: "string",
+          description: 'Replacement color as hex string (e.g. "#00ff00")',
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "fromColor", "toColor"],
+    },
+  },
+  {
+    name: "outline",
+    category: "drawing",
+    readOnly: false,
+    description:
+      "Add an outline of a given color around non-transparent pixels. Common pixel art operation for adding borders to sprites.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        color: {
+          type: "string",
+          description: 'Outline color as hex string (e.g. "#000000")',
+        },
+        frameNumber: {
+          type: "number",
+          description: "1-based frame number (default: 1)",
+        },
+        layerIndex: {
+          type: "number",
+          description: "1-based layer index (default: 1)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "color"],
+    },
+  },
+
+  // ── Round 3 — Animation Workflow ─────────────────────────────
+  {
+    name: "duplicate_frame",
+    category: "frame",
+    readOnly: false,
+    description:
+      "Clone an existing frame with all cel content, creating a new frame after the source.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        frameNumber: {
+          type: "number",
+          description: "1-based frame number to duplicate (default: 1)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath"],
+    },
+  },
+  {
+    name: "set_tag_properties",
+    category: "tag",
+    readOnly: false,
+    description:
+      "Modify properties of an existing animation tag (name, color, direction, repeat count).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        tagName: {
+          type: "string",
+          description: "Name of the tag to modify",
+        },
+        name: {
+          type: "string",
+          description: "New name for the tag",
+        },
+        color: {
+          type: "string",
+          description: 'Tag color as hex string (e.g. "#ff0000")',
+        },
+        aniDir: {
+          type: "string",
+          enum: ["forward", "reverse", "pingpong"],
+          description: "Animation direction",
+        },
+        repeats: {
+          type: "number",
+          description: "Number of times to repeat the animation (0 = infinite)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "tagName"],
+    },
+  },
+  {
+    name: "copy_cel",
+    category: "cel",
+    readOnly: false,
+    description:
+      "Copy cel content (image and position) from one frame/layer to another.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        sourceFrame: {
+          type: "number",
+          description: "1-based source frame number",
+        },
+        sourceLayer: {
+          type: "number",
+          description: "1-based source layer index",
+        },
+        destFrame: {
+          type: "number",
+          description: "1-based destination frame number",
+        },
+        destLayer: {
+          type: "number",
+          description: "1-based destination layer index",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: [
+        "inputPath",
+        "sourceFrame",
+        "sourceLayer",
+        "destFrame",
+        "destLayer",
+      ],
+    },
+  },
+
+  // ── Round 4 — Tileset & Tilemap ──────────────────────────────
+  {
+    name: "create_tilemap_layer",
+    category: "tilemap",
+    readOnly: false,
+    description:
+      "Create a tilemap layer with a tileset grid. Requires Aseprite 1.3+.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        name: {
+          type: "string",
+          description: 'Layer name (default: "Tilemap")',
+        },
+        tileWidth: {
+          type: "number",
+          description: "Tile width in pixels (default: 16)",
+        },
+        tileHeight: {
+          type: "number",
+          description: "Tile height in pixels (default: 16)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath"],
+    },
+  },
+  {
+    name: "set_tile",
+    category: "tilemap",
+    readOnly: false,
+    description:
+      "Place a tile at grid coordinates in a tilemap layer by setting the tile index.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        col: {
+          type: "number",
+          description: "0-based column in the tilemap grid",
+        },
+        row: {
+          type: "number",
+          description: "0-based row in the tilemap grid",
+        },
+        tileIndex: {
+          type: "number",
+          description: "Index of the tile in the tileset",
+        },
+        layerIndex: {
+          type: "number",
+          description: "1-based layer index (default: 1)",
+        },
+        frameNumber: {
+          type: "number",
+          description: "1-based frame number (default: 1)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "col", "row", "tileIndex"],
+    },
+  },
+  {
+    name: "get_tileset_info",
+    category: "tilemap",
+    readOnly: true,
+    description:
+      "Get tileset metadata from a tilemap layer including tile count and grid dimensions.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        layerIndex: {
+          type: "number",
+          description:
+            "1-based layer index (default: first tilemap layer found)",
+        },
+      },
+      required: ["inputPath"],
+    },
+  },
+
+  // ── Round 5 — Batch Operations ───────────────────────────────
+  {
+    name: "batch_export",
+    category: "batch",
+    readOnly: false,
+    description:
+      "Export multiple frames and/or layers as individual PNG files using a naming pattern with {frame}, {frame00}, {layer} placeholders.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        outputPattern: {
+          type: "string",
+          description:
+            'Output path pattern with placeholders (e.g. "/path/to/{layer}_{frame00}.png")',
+        },
+        mode: {
+          type: "string",
+          enum: ["frames", "layers", "both"],
+          description:
+            'Export mode: "frames" exports all frames, "layers" exports per-layer, "both" exports every layer×frame combination (default: "frames")',
+        },
+        fromFrame: {
+          type: "number",
+          description: "1-based start frame (default: 1)",
+        },
+        toFrame: {
+          type: "number",
+          description: "1-based end frame (default: last frame)",
+        },
+      },
+      required: ["inputPath", "outputPattern"],
+    },
+  },
+  {
+    name: "batch_resize",
+    category: "batch",
+    readOnly: false,
+    description:
+      "Resize multiple sprite files by a scale factor. Useful for generating multi-resolution assets.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPaths: {
+          type: "array",
+          items: { type: "string" },
+          description: "Array of absolute paths to sprite files",
+        },
+        scale: {
+          type: "number",
+          description: "Scale factor (e.g. 2 for 2x, 0.5 for half size)",
+        },
+        outputDir: {
+          type: "string",
+          description:
+            "Output directory for resized files (default: overwrite originals)",
+        },
+      },
+      required: ["inputPaths", "scale"],
+    },
+  },
+  {
+    name: "import_spritesheet",
+    category: "batch",
+    readOnly: false,
+    description:
+      "Import a sprite sheet PNG and split it into individual frames based on grid dimensions.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        imagePath: {
+          type: "string",
+          description: "Absolute path to the sprite sheet PNG",
+        },
+        outputPath: {
+          type: "string",
+          description:
+            "Absolute path to save the resulting .aseprite sprite file",
+        },
+        frameWidth: {
+          type: "number",
+          description: "Width of each frame in pixels",
+        },
+        frameHeight: {
+          type: "number",
+          description: "Height of each frame in pixels",
+        },
+        duration: {
+          type: "number",
+          description:
+            "Frame duration in seconds for all frames (e.g. 0.1 for 100ms)",
+        },
+      },
+      required: ["imagePath", "outputPath", "frameWidth", "frameHeight"],
+    },
+  },
+
+  // ── Round 6 — Color & Analysis ───────────────────────────────
+  {
+    name: "analyze_colors",
+    category: "color",
+    readOnly: true,
+    description:
+      "Analyze sprite colors: count unique colors, find most/least used, detect unused palette entries. Returns a full color histogram.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        frameNumber: {
+          type: "number",
+          description: "1-based frame number to analyze (default: 1)",
+        },
+      },
+      required: ["inputPath"],
+    },
+  },
+  {
+    name: "quantize_colors",
+    category: "color",
+    readOnly: false,
+    description:
+      "Reduce the number of colors in a sprite to fit a target palette size using Aseprite's built-in color quantization.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        maxColors: {
+          type: "number",
+          description: "Maximum number of colors in the palette",
+        },
+        dithering: {
+          type: "string",
+          enum: ["none", "ordered", "old"],
+          description: 'Dithering algorithm (default: "none")',
+        },
+        keepRgb: {
+          type: "boolean",
+          description: "Convert back to RGB after quantization (default: true)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "maxColors"],
+    },
+  },
+  {
+    name: "generate_palette",
+    category: "color",
+    readOnly: false,
+    description:
+      "Auto-generate a palette from the sprite's actual pixel colors, sorted by frequency of use.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        maxColors: {
+          type: "number",
+          description: "Maximum palette size (default: 32)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath"],
+    },
+  },
+  {
+    name: "color_ramp",
+    category: "color",
+    readOnly: false,
+    description:
+      "Generate a color ramp (gradient) between two colors. Optionally apply it to a sprite's palette.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        fromColor: {
+          type: "string",
+          description: 'Start color as hex string (e.g. "#000000")',
+        },
+        toColor: {
+          type: "string",
+          description: 'End color as hex string (e.g. "#ffffff")',
+        },
+        steps: {
+          type: "number",
+          description: "Number of colors in the ramp (default: 5)",
+        },
+        inputPath: {
+          type: "string",
+          description:
+            "Absolute path to a sprite file — if provided, applies the ramp to its palette",
+        },
+        paletteStart: {
+          type: "number",
+          description: "Palette index to start writing the ramp (default: 0)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["fromColor", "toColor"],
+    },
+  },
 ];

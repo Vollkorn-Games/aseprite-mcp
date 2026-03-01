@@ -61,7 +61,7 @@ Add to your MCP configuration:
 | `MCP_EXCLUDE_TOOLS` | Comma-separated list of tool names to exclude     |
 | `MCP_READ_ONLY`     | Set to `true` to expose only read-only tools      |
 
-## 42 Tools Across 10 Categories
+## 59 Tools Across 14 Categories
 
 ### Sprite Management (5 tools)
 
@@ -83,7 +83,7 @@ Add to your MCP configuration:
 | `list_layers`          | List all layers with metadata             |
 | `flatten_layers`       | Flatten all layers into one               |
 
-### Frame & Animation (5 tools)
+### Frame & Animation (6 tools)
 
 | Tool                 | Description                        |
 | -------------------- | ---------------------------------- |
@@ -92,17 +92,22 @@ Add to your MCP configuration:
 | `set_frame_duration` | Set frame duration in seconds      |
 | `list_frames`        | List all frames with durations     |
 | `reorder_frames`     | Reverse frame order within a range |
+| `duplicate_frame`    | Clone a frame with all cel content |
 
-### Drawing Operations (6 tools)
+### Drawing Operations (10 tools)
 
-| Tool           | Description                          |
-| -------------- | ------------------------------------ |
-| `draw_pixel`   | Set a single pixel color             |
-| `draw_pixels`  | Set multiple pixels at once (batch)  |
-| `draw_line`    | Draw line between two points         |
-| `draw_rect`    | Draw rectangle (filled or outline)   |
-| `draw_ellipse` | Draw ellipse (filled or outline)     |
-| `flood_fill`   | Flood fill from a point with a color |
+| Tool            | Description                                  |
+| --------------- | -------------------------------------------- |
+| `draw_pixel`    | Set a single pixel color                     |
+| `draw_pixels`   | Set multiple pixels at once (batch)          |
+| `draw_line`     | Draw line between two points                 |
+| `draw_rect`     | Draw rectangle (filled or outline)           |
+| `draw_ellipse`  | Draw ellipse (filled or outline)             |
+| `flood_fill`    | Flood fill from a point with a color         |
+| `draw_image`    | Paste an external PNG onto a layer           |
+| `draw_circle`   | Draw circle (filled or outline)              |
+| `replace_color` | Replace all pixels of one color with another |
+| `outline`       | Add outline around non-transparent pixels    |
 
 ### Palette Management (5 tools)
 
@@ -132,13 +137,14 @@ Add to your MCP configuration:
 | `crop_sprite`   | Crop to rectangle or auto-crop to content |
 | `trim_sprite`   | Auto-trim transparent borders             |
 
-### Tag Operations (3 tools)
+### Tag Operations (4 tools)
 
-| Tool         | Description                           |
-| ------------ | ------------------------------------- |
-| `create_tag` | Create animation tag over frame range |
-| `remove_tag` | Remove tag by name                    |
-| `list_tags`  | List all tags with frame ranges       |
+| Tool                 | Description                                     |
+| -------------------- | ----------------------------------------------- |
+| `create_tag`         | Create animation tag over frame range           |
+| `remove_tag`         | Remove tag by name                              |
+| `list_tags`          | List all tags with frame ranges                 |
+| `set_tag_properties` | Modify tag name, color, direction, repeat count |
 
 ### Export Operations (3 tools)
 
@@ -148,12 +154,38 @@ Add to your MCP configuration:
 | `export_spritesheet` | Generate sprite sheet with JSON metadata |
 | `export_gif`         | Export as animated GIF                   |
 
-### Cel Operations (2 tools)
+### Cel Operations (3 tools)
 
-| Tool           | Description                       |
-| -------------- | --------------------------------- |
-| `clear_cel`    | Clear cel content                 |
-| `get_cel_info` | Get cel position, opacity, bounds |
+| Tool           | Description                            |
+| -------------- | -------------------------------------- |
+| `clear_cel`    | Clear cel content                      |
+| `get_cel_info` | Get cel position, opacity, bounds      |
+| `copy_cel`     | Copy cel content between frames/layers |
+
+### Tileset & Tilemap (3 tools)
+
+| Tool                   | Description                              |
+| ---------------------- | ---------------------------------------- |
+| `create_tilemap_layer` | Create a tilemap layer with tileset grid |
+| `set_tile`             | Place a tile at grid coordinates         |
+| `get_tileset_info`     | Get tileset metadata and tile count      |
+
+### Batch Operations (3 tools)
+
+| Tool                 | Description                                  |
+| -------------------- | -------------------------------------------- |
+| `batch_export`       | Export frames/layers as individual PNGs      |
+| `batch_resize`       | Resize multiple sprites by scale factor      |
+| `import_spritesheet` | Import spritesheet PNG and split into frames |
+
+### Color & Analysis (4 tools)
+
+| Tool               | Description                                |
+| ------------------ | ------------------------------------------ |
+| `analyze_colors`   | Count unique colors, find most/least used  |
+| `quantize_colors`  | Reduce color count to target palette size  |
+| `generate_palette` | Auto-generate palette from sprite colors   |
+| `color_ramp`       | Generate color gradient between two colors |
 
 ## Tool Filtering
 

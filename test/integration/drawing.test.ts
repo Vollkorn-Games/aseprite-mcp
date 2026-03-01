@@ -8,7 +8,12 @@ import {
   handleDrawPixels,
   handleDrawLine,
   handleDrawRect,
+  handleDrawCircle,
+  handleReplaceColor,
+  handleOutline,
+  handleDrawImage,
 } from "../../src/handlers/drawing-handlers.js";
+import { handleExportPng } from "../../src/handlers/export-handlers.js";
 
 describe("Drawing handlers", () => {
   let ctx: ServerContext;
@@ -114,6 +119,110 @@ describe("Drawing handlers", () => {
     assertError(res);
   });
 
+  it("draws a circle", async () => {
+    const spritePath = cleanup.track("test_draw_circle.aseprite");
+    await handleCreateSprite(ctx, {
+      width: 32,
+      height: 32,
+      outputPath: spritePath,
+    });
+
+    const res = await handleDrawCircle(ctx, {
+      inputPath: spritePath,
+      centerX: 16,
+      centerY: 16,
+      radius: 8,
+      color: "#ff0000",
+      outputPath: spritePath,
+    });
+    const text = assertSuccess(res);
+    const data = JSON.parse(text);
+    expect(data.success).toBe(true);
+    expect(data.radius).toBe(8);
+  });
+
+  it("replaces a color", async () => {
+    const spritePath = cleanup.track("test_replace_color.aseprite");
+    await handleCreateSprite(ctx, {
+      width: 16,
+      height: 16,
+      outputPath: spritePath,
+    });
+    await handleDrawRect(ctx, {
+      inputPath: spritePath,
+      x: 0,
+      y: 0,
+      width: 16,
+      height: 16,
+      color: "#ff0000",
+      outputPath: spritePath,
+    });
+
+    const res = await handleReplaceColor(ctx, {
+      inputPath: spritePath,
+      fromColor: "#ff0000",
+      toColor: "#00ff00",
+      outputPath: spritePath,
+    });
+    const text = assertSuccess(res);
+    const data = JSON.parse(text);
+    expect(data.success).toBe(true);
+  });
+
+  it("adds an outline", async () => {
+    const spritePath = cleanup.track("test_outline.aseprite");
+    await handleCreateSprite(ctx, {
+      width: 16,
+      height: 16,
+      outputPath: spritePath,
+    });
+    await handleDrawRect(ctx, {
+      inputPath: spritePath,
+      x: 4,
+      y: 4,
+      width: 8,
+      height: 8,
+      color: "#ff0000",
+      outputPath: spritePath,
+    });
+
+    const res = await handleOutline(ctx, {
+      inputPath: spritePath,
+      color: "#000000",
+      outputPath: spritePath,
+    });
+    const text = assertSuccess(res);
+    const data = JSON.parse(text);
+    expect(data.success).toBe(true);
+    expect(data.outlinePixelCount).toBeGreaterThan(0);
+  });
+
+  it("draws an image", async () => {
+    const spritePath = cleanup.track("test_draw_image.aseprite");
+    const pngPath = cleanup.track("test_draw_image_src.png");
+    await handleCreateSprite(ctx, {
+      width: 16,
+      height: 16,
+      outputPath: spritePath,
+    });
+    // Export a small PNG to use as source image
+    await handleExportPng(ctx, {
+      inputPath: spritePath,
+      outputPath: pngPath,
+    });
+
+    const res = await handleDrawImage(ctx, {
+      inputPath: spritePath,
+      imagePath: pngPath,
+      x: 0,
+      y: 0,
+      outputPath: spritePath,
+    });
+    const text = assertSuccess(res);
+    const data = JSON.parse(text);
+    expect(data.success).toBe(true);
+  });
+
   it("returns error for missing color", async () => {
     const res = await handleDrawLine(ctx, {
       inputPath: "/tmp/test.aseprite",
@@ -121,6 +230,20 @@ describe("Drawing handlers", () => {
       y1: 0,
       x2: 10,
       y2: 10,
+    });
+    assertError(res);
+  });
+
+  it("returns error for missing imagePath", async () => {
+    const res = await handleDrawImage(ctx, {
+      inputPath: "/tmp/test.aseprite",
+    });
+    assertError(res);
+  });
+
+  it("returns error for missing circle params", async () => {
+    const res = await handleDrawCircle(ctx, {
+      inputPath: "/tmp/test.aseprite",
     });
     assertError(res);
   });
