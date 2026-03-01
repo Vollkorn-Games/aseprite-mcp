@@ -36,14 +36,13 @@ Add to your MCP configuration:
   "mcpServers": {
     "aseprite-mcp": {
       "command": "node",
-      "args": ["/path/to/aseprite-mcp/build/index.js"],
-      "env": {
-        "ASEPRITE_PATH": "/path/to/aseprite"
-      }
+      "args": ["/path/to/aseprite-mcp/build/index.js"]
     }
   }
 }
 ```
+
+Aseprite is auto-detected from common install locations (Steam, `/usr/bin`, `/Applications`, etc.). Set `ASEPRITE_PATH` only if auto-detection fails.
 
 ## Requirements
 
@@ -55,7 +54,7 @@ Add to your MCP configuration:
 
 | Variable            | Description                                       |
 | ------------------- | ------------------------------------------------- |
-| `ASEPRITE_PATH`     | Path to the Aseprite executable                   |
+| `ASEPRITE_PATH`     | Path to the Aseprite executable (auto-detected)   |
 | `DEBUG`             | Set to `true` for verbose logging                 |
 | `MCP_TOOLSETS`      | Comma-separated list of tool categories to expose |
 | `MCP_EXCLUDE_TOOLS` | Comma-separated list of tool names to exclude     |
@@ -220,7 +219,7 @@ pnpm watch            # Auto-rebuild on changes
 
 ### Aseprite not found
 
-Set the `ASEPRITE_PATH` environment variable:
+The server auto-detects Aseprite from common locations including Steam, `/usr/bin`, `/usr/local/bin`, `/Applications`, and standard Windows paths. If auto-detection fails, set the `ASEPRITE_PATH` environment variable:
 
 ```bash
 # Linux
