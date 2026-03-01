@@ -1,0 +1,60 @@
+{
+  "name": "aseprite-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for interfacing with Aseprite pixel art editor. Provides tools for creating sprites, drawing, managing layers/frames/palettes, and exporting assets.",
+  "keywords": [
+    "aseprite",
+    "mcp",
+    "pixel-art",
+    "ai",
+    "claude",
+    "sprite"
+  ],
+  "homepage": "https://github.com/Vollkorn-Games/aseprite-mcp",
+  "bugs": {
+    "url": "https://github.com/Vollkorn-Games/aseprite-mcp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vollkorn-Games/aseprite-mcp.git"
+  },
+  "license": "MIT",
+  "author": "Vollkorn Games",
+  "type": "module",
+  "bin": {
+    "aseprite-mcp": "./build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc && node scripts/build.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run test/unit/",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "inspector": "pnpm dlx @modelcontextprotocol/inspector build/index.js",
+    "prepare": "pnpm run build",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.27.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^20.11.24",
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.3.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@10.28.2"
+}
