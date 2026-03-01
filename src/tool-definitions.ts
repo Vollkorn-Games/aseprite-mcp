@@ -1816,4 +1816,215 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
       required: ["fromColor", "toColor"],
     },
   },
+  // ── Round 7 — Pixel Reading, Polygon, Bulk Frames, Cel Movement ──
+  {
+    name: "get_pixels",
+    category: "drawing",
+    readOnly: true,
+    description:
+      "Read pixel colors from a rectangular region of the canvas. Returns array of {x, y, hex} for non-transparent pixels.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        x: {
+          type: "number",
+          description: "Region X origin (default: 0)",
+        },
+        y: {
+          type: "number",
+          description: "Region Y origin (default: 0)",
+        },
+        width: {
+          type: "number",
+          description: "Region width (default: full sprite width)",
+        },
+        height: {
+          type: "number",
+          description: "Region height (default: full sprite height)",
+        },
+        frameNumber: {
+          type: "number",
+          description: "1-based frame number (default: 1)",
+        },
+        layerIndex: {
+          type: "number",
+          description: "1-based layer index (default: 1)",
+        },
+      },
+      required: ["inputPath"],
+    },
+  },
+  {
+    name: "draw_polygon",
+    category: "drawing",
+    readOnly: false,
+    description:
+      "Draw a filled or outline polygon from a list of vertex points.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        points: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              x: { type: "number", description: "X coordinate" },
+              y: { type: "number", description: "Y coordinate" },
+            },
+            required: ["x", "y"],
+          },
+          description:
+            "Array of vertex points (at least 3). Polygon is closed automatically.",
+        },
+        color: {
+          type: "string",
+          description: 'Color as hex string (e.g. "#ff0000")',
+        },
+        filled: {
+          type: "boolean",
+          description: "Fill the polygon (default: true)",
+        },
+        brushSize: {
+          type: "number",
+          description: "Brush size for outline (default: 1)",
+        },
+        frameNumber: {
+          type: "number",
+          description: "1-based frame number (default: 1)",
+        },
+        layerIndex: {
+          type: "number",
+          description: "1-based layer index (default: 1)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "points", "color"],
+    },
+  },
+  {
+    name: "get_canvas",
+    category: "drawing",
+    readOnly: true,
+    description:
+      "Dump the full canvas as a 2D grid of hex color strings. Max sprite size: 128x128. Use get_pixels for larger sprites.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        frameNumber: {
+          type: "number",
+          description: "1-based frame number (default: 1)",
+        },
+      },
+      required: ["inputPath"],
+    },
+  },
+  {
+    name: "add_frames",
+    category: "frame",
+    readOnly: false,
+    description:
+      "Bulk add multiple empty frames at once with optional duration.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        count: {
+          type: "number",
+          description: "Number of frames to add (must be at least 1)",
+        },
+        duration: {
+          type: "number",
+          description:
+            "Duration in seconds for all new frames (e.g. 0.1 for 100ms)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "count"],
+    },
+  },
+  {
+    name: "set_frame_durations",
+    category: "frame",
+    readOnly: false,
+    description:
+      "Set durations for multiple frames at once using a frame-number-to-duration mapping.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        durations: {
+          type: "object",
+          additionalProperties: { type: "number" },
+          description:
+            'Object mapping frame numbers (as strings) to durations in seconds, e.g. {"1": 0.2, "2": 0.1, "3": 0.5}',
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "durations"],
+    },
+  },
+  {
+    name: "move_cel",
+    category: "cel",
+    readOnly: false,
+    description:
+      "Move/translate cel content by an offset. Shifts the cel position without modifying pixel data.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        inputPath: {
+          type: "string",
+          description: "Absolute path to the sprite file",
+        },
+        offsetX: {
+          type: "number",
+          description: "Horizontal offset in pixels (positive = right)",
+        },
+        offsetY: {
+          type: "number",
+          description: "Vertical offset in pixels (positive = down)",
+        },
+        frameNumber: {
+          type: "number",
+          description: "1-based frame number (default: 1)",
+        },
+        layerIndex: {
+          type: "number",
+          description: "1-based layer index (default: 1)",
+        },
+        outputPath: {
+          type: "string",
+          description: "Absolute path to save the modified sprite",
+        },
+      },
+      required: ["inputPath", "offsetX", "offsetY"],
+    },
+  },
 ];

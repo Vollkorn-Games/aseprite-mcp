@@ -2826,6 +2826,372 @@ function operations.color_ramp(params)
 end
 
 -- ============================================================
+-- Round 7 — Pixel Reading, Polygon, Bulk Frames, Cel Movement
+-- ============================================================
+
+function operations.get_pixels(params)
+  if not params.inputPath then
+    send_error("inputPath is required")
+    return
+  end
+
+  local sprite = Sprite{ fromFile = params.inputPath }
+  if not sprite then
+    send_error("Failed to open sprite: " .. params.inputPath)
+    return
+  end
+
+  local frameNumber = params.frameNumber or 1
+  local img = Image(sprite.spec)
+  img:drawSprite(sprite, frameNumber)
+
+  local regionX = params.x or 0
+  local regionY = params.y or 0
+  local regionW = params.width or sprite.width
+  local regionH = params.height or sprite.height
+
+  -- Clamp to sprite bounds
+  if regionX < 0 then regionX = 0 end
+  if regionY < 0 then regionY = 0 end
+  if regionX + regionW > sprite.width then regionW = sprite.width - regionX end
+  if regionY + regionH > sprite.height then regionH = sprite.height - regionY end
+
+  local pixels = {}
+  for py = regionY, regionY + regionH - 1 do
+    for px = regionX, regionX + regionW - 1 do
+      local pxVal = img:getPixel(px, py)
+      local a = app.pixelColor.rgbaA(pxVal)
+      if a > 0 then
+        local r = app.pixelColor.rgbaR(pxVal)
+        local g = app.pixelColor.rgbaG(pxVal)
+        local b = app.pixelColor.rgbaB(pxVal)
+        local hex
+        if a < 255 then
+          hex = string.format("#%02x%02x%02x%02x", r, g, b, a)
+        else
+          hex = string.format("#%02x%02x%02x", r, g, b)
+        end
+        pixels[#pixels + 1] = { x = px, y = py, hex = hex }
+      end
+    end
+  end
+
+  send_result({
+    success = true,
+    region = { x = regionX, y = regionY, width = regionW, height = regionH },
+    pixelCount = #pixels,
+    pixels = pixels,
+  })
+
+  sprite:close()
+end
+
+function operations.draw_polygon(params)
+  if not params.inputPath then
+    send_error("inputPath is required")
+    return
+  end
+  if not params.points or #params.points < 3 then
+    send_error("At least 3 points are required")
+    return
+  end
+
+  local sprite = Sprite{ fromFile = params.inputPath }
+  if not sprite then
+    send_error("Failed to open sprite: " .. params.inputPath)
+    return
+  end
+
+  local frameNumber = params.frameNumber or 1
+  local layerIndex = params.layerIndex or 1
+
+  app.sprite = sprite
+  app.layer = sprite.layers[layerIndex]
+  app.frame = sprite.frames[frameNumber]
+
+  local color = parse_color(params.color or "#000000")
+  local filled = params.filled ~= false -- default true
+  local brushSize = params.brushSize or 1
+  local points = params.points
+
+  -- Draw outline: lines between consecutive points, closing the polygon
+  for i = 1, #points do
+    local p1 = points[i]
+    local p2 = points[(i % #points) + 1]
+    app.useTool{
+      tool = "line",
+      color = color,
+      points = { Point(p1.x or 0, p1.y or 0), Point(p2.x or 0, p2.y or 0) },
+      brush = Brush{ size = brushSize },
+      layer = app.layer,
+      frame = app.frame,
+    }
+  end
+
+  if filled then
+    -- Scanline fill algorithm
+    local minY = points[1].y or 0
+    local maxY = points[1].y or 0
+    for _, p in ipairs(points) do
+      local py = p.y or 0
+      if py < minY then minY = py end
+      if py > maxY then maxY = py end
+    end
+
+    local cel = app.cel
+    if cel then
+      local image = cel.image
+      local celX = cel.position.x
+      local celY = cel.position.y
+      local pixelValue = app.pixelColor.rgba(color.red, color.green, color.blue, color.alpha)
+
+      for scanY = minY, maxY do
+        local intersections = {}
+        for i = 1, #points do
+          local p1 = points[i]
+          local p2 = points[(i % #points) + 1]
+          local y1 = p1.y or 0
+          local y2 = p2.y or 0
+          local x1 = p1.x or 0
+          local x2 = p2.x or 0
+
+          if (y1 <= scanY and y2 > scanY) or (y2 <= scanY and y1 > scanY) then
+            local xIntersect = x1 + (scanY - y1) * (x2 - x1) / (y2 - y1)
+            intersections[#intersections + 1] = math.floor(xIntersect + 0.5)
+          end
+        end
+
+        table.sort(intersections)
+
+        for j = 1, #intersections - 1, 2 do
+          for fillX = intersections[j], intersections[j + 1] do
+            local ix = fillX - celX
+            local iy = scanY - celY
+            if ix >= 0 and ix < image.width and iy >= 0 and iy < image.height then
+              image:drawPixel(ix, iy, pixelValue)
+            end
+          end
+        end
+      end
+
+      cel.image = image
+    end
+  end
+
+  local savePath = params.outputPath or params.inputPath
+  sprite:saveCopyAs(savePath)
+
+  send_result({
+    success = true,
+    pointCount = #points,
+    filled = filled,
+    savedTo = savePath,
+  })
+
+  sprite:close()
+end
+
+function operations.get_canvas(params)
+  if not params.inputPath then
+    send_error("inputPath is required")
+    return
+  end
+
+  local sprite = Sprite{ fromFile = params.inputPath }
+  if not sprite then
+    send_error("Failed to open sprite: " .. params.inputPath)
+    return
+  end
+
+  local maxDimension = 128
+  if sprite.width > maxDimension or sprite.height > maxDimension then
+    send_error("Sprite too large for get_canvas (max " .. maxDimension .. "x" .. maxDimension .. "). Use get_pixels with a region instead. Current size: " .. sprite.width .. "x" .. sprite.height)
+    sprite:close()
+    return
+  end
+
+  local frameNumber = params.frameNumber or 1
+  local img = Image(sprite.spec)
+  img:drawSprite(sprite, frameNumber)
+
+  local grid = {}
+  for y = 0, sprite.height - 1 do
+    local row = {}
+    for x = 0, sprite.width - 1 do
+      local px = img:getPixel(x, y)
+      local a = app.pixelColor.rgbaA(px)
+      if a == 0 then
+        row[#row + 1] = ""
+      else
+        local r = app.pixelColor.rgbaR(px)
+        local g = app.pixelColor.rgbaG(px)
+        local b = app.pixelColor.rgbaB(px)
+        if a < 255 then
+          row[#row + 1] = string.format("#%02x%02x%02x%02x", r, g, b, a)
+        else
+          row[#row + 1] = string.format("#%02x%02x%02x", r, g, b)
+        end
+      end
+    end
+    grid[#grid + 1] = row
+  end
+
+  send_result({
+    success = true,
+    width = sprite.width,
+    height = sprite.height,
+    frameNumber = frameNumber,
+    grid = grid,
+  })
+
+  sprite:close()
+end
+
+function operations.add_frames(params)
+  if not params.inputPath then
+    send_error("inputPath is required")
+    return
+  end
+  if not params.count or params.count < 1 then
+    send_error("count is required and must be at least 1")
+    return
+  end
+
+  local sprite = Sprite{ fromFile = params.inputPath }
+  if not sprite then
+    send_error("Failed to open sprite: " .. params.inputPath)
+    return
+  end
+
+  local count = params.count
+  local duration = params.duration
+  local addedFrames = {}
+
+  for i = 1, count do
+    local frame = sprite:newEmptyFrame(#sprite.frames + 1)
+    if duration then
+      frame.duration = duration
+    end
+    addedFrames[#addedFrames + 1] = {
+      frameNumber = frame.frameNumber,
+      duration = frame.duration,
+    }
+  end
+
+  local savePath = params.outputPath or params.inputPath
+  sprite:saveCopyAs(savePath)
+
+  send_result({
+    success = true,
+    framesAdded = count,
+    frameCount = #sprite.frames,
+    addedFrames = addedFrames,
+    savedTo = savePath,
+  })
+
+  sprite:close()
+end
+
+function operations.set_frame_durations(params)
+  if not params.inputPath then
+    send_error("inputPath is required")
+    return
+  end
+  if not params.durations then
+    send_error("durations is required")
+    return
+  end
+
+  local sprite = Sprite{ fromFile = params.inputPath }
+  if not sprite then
+    send_error("Failed to open sprite: " .. params.inputPath)
+    return
+  end
+
+  local updated = {}
+  for frameStr, duration in pairs(params.durations) do
+    local frameNum = tonumber(frameStr)
+    if frameNum then
+      local frame = sprite.frames[frameNum]
+      if frame then
+        frame.duration = duration
+        updated[#updated + 1] = {
+          frameNumber = frameNum,
+          duration = duration,
+        }
+      end
+    end
+  end
+
+  local savePath = params.outputPath or params.inputPath
+  sprite:saveCopyAs(savePath)
+
+  send_result({
+    success = true,
+    framesUpdated = #updated,
+    updated = updated,
+    savedTo = savePath,
+  })
+
+  sprite:close()
+end
+
+function operations.move_cel(params)
+  if not params.inputPath then
+    send_error("inputPath is required")
+    return
+  end
+
+  local sprite = Sprite{ fromFile = params.inputPath }
+  if not sprite then
+    send_error("Failed to open sprite: " .. params.inputPath)
+    return
+  end
+
+  local frameNumber = params.frameNumber or 1
+  local layerIndex = params.layerIndex or 1
+
+  local layer = sprite.layers[layerIndex]
+  local frame = sprite.frames[frameNumber]
+
+  if not layer or not frame then
+    send_error("Layer or frame not found")
+    sprite:close()
+    return
+  end
+
+  app.sprite = sprite
+  app.layer = layer
+  app.frame = frame
+
+  local cel = app.cel
+  if not cel then
+    send_error("No cel found at specified frame/layer")
+    sprite:close()
+    return
+  end
+
+  local offsetX = params.offsetX or 0
+  local offsetY = params.offsetY or 0
+  local oldPos = { x = cel.position.x, y = cel.position.y }
+  cel.position = Point(cel.position.x + offsetX, cel.position.y + offsetY)
+  local newPos = { x = cel.position.x, y = cel.position.y }
+
+  local savePath = params.outputPath or params.inputPath
+  sprite:saveCopyAs(savePath)
+
+  send_result({
+    success = true,
+    oldPosition = oldPos,
+    newPosition = newPos,
+    offset = { x = offsetX, y = offsetY },
+    savedTo = savePath,
+  })
+
+  sprite:close()
+end
+
+-- ============================================================
 -- Main dispatch
 -- ============================================================
 

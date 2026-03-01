@@ -509,3 +509,128 @@ export async function handleOutline(
     );
   }
 }
+
+export async function handleGetPixels(
+  ctx: ServerContext,
+  args: any,
+): Promise<ToolResponse> {
+  args = normalizeParameters(args);
+
+  if (!args.inputPath) {
+    return createErrorResponse("Missing required parameter: inputPath", [
+      "Provide the absolute path to the sprite file",
+    ]);
+  }
+
+  if (!validatePath(args.inputPath)) {
+    return createErrorResponse("Invalid path", [
+      'Provide a valid path without ".."',
+    ]);
+  }
+
+  try {
+    const { stdout } = await executeOperation(ctx, "get_pixels", {
+      inputPath: args.inputPath,
+      x: args.x,
+      y: args.y,
+      width: args.width,
+      height: args.height,
+      frameNumber: args.frameNumber,
+      layerIndex: args.layerIndex,
+    });
+
+    return { content: [{ type: "text", text: stdout }] };
+  } catch (error: any) {
+    return createErrorResponse(
+      `Failed to get pixels: ${error?.message ?? "Unknown error"}`,
+      ["Ensure the sprite file exists and coordinates are valid"],
+    );
+  }
+}
+
+export async function handleDrawPolygon(
+  ctx: ServerContext,
+  args: any,
+): Promise<ToolResponse> {
+  args = normalizeParameters(args);
+
+  if (!args.inputPath) {
+    return createErrorResponse("Missing required parameter: inputPath", [
+      "Provide the absolute path to the sprite file",
+    ]);
+  }
+
+  if (!args.points || !Array.isArray(args.points) || args.points.length < 3) {
+    return createErrorResponse("Missing required parameter: points", [
+      "Provide an array of at least 3 point objects: [{ x, y }, ...]",
+    ]);
+  }
+
+  if (!args.color) {
+    return createErrorResponse("Missing required parameter: color", [
+      'Provide a hex color string (e.g. "#ff0000")',
+    ]);
+  }
+
+  if (!validatePath(args.inputPath)) {
+    return createErrorResponse("Invalid path", [
+      'Provide a valid path without ".."',
+    ]);
+  }
+
+  try {
+    const { stdout } = await executeOperation(ctx, "draw_polygon", {
+      inputPath: args.inputPath,
+      points: args.points,
+      color: args.color,
+      filled: args.filled,
+      brushSize: args.brushSize,
+      frameNumber: args.frameNumber,
+      layerIndex: args.layerIndex,
+      outputPath: args.outputPath,
+    });
+
+    return { content: [{ type: "text", text: stdout }] };
+  } catch (error: any) {
+    return createErrorResponse(
+      `Failed to draw polygon: ${error?.message ?? "Unknown error"}`,
+      ["Ensure coordinates are within sprite bounds"],
+    );
+  }
+}
+
+export async function handleGetCanvas(
+  ctx: ServerContext,
+  args: any,
+): Promise<ToolResponse> {
+  args = normalizeParameters(args);
+
+  if (!args.inputPath) {
+    return createErrorResponse("Missing required parameter: inputPath", [
+      "Provide the absolute path to the sprite file",
+    ]);
+  }
+
+  if (!validatePath(args.inputPath)) {
+    return createErrorResponse("Invalid path", [
+      'Provide a valid path without ".."',
+    ]);
+  }
+
+  try {
+    const { stdout } = await executeOperation(ctx, "get_canvas", {
+      inputPath: args.inputPath,
+      frameNumber: args.frameNumber,
+    });
+
+    return { content: [{ type: "text", text: stdout }] };
+  } catch (error: any) {
+    return createErrorResponse(
+      `Failed to get canvas: ${error?.message ?? "Unknown error"}`,
+      [
+        "Ensure the sprite file exists",
+        "Sprite must be 128x128 or smaller. Use get_pixels with a region for larger sprites.",
+      ],
+    );
+  }
+}

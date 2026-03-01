@@ -219,3 +219,84 @@ export async function handleDuplicateFrame(
     );
   }
 }
+
+export async function handleAddFrames(
+  ctx: ServerContext,
+  args: any,
+): Promise<ToolResponse> {
+  args = normalizeParameters(args);
+
+  if (!args.inputPath) {
+    return createErrorResponse("Missing required parameter: inputPath", [
+      "Provide the absolute path to the sprite file",
+    ]);
+  }
+
+  if (!args.count || args.count < 1) {
+    return createErrorResponse("Missing required parameter: count", [
+      "Provide the number of frames to add (must be at least 1)",
+    ]);
+  }
+
+  if (!validatePath(args.inputPath)) {
+    return createErrorResponse("Invalid path", [
+      'Provide a valid path without ".."',
+    ]);
+  }
+
+  try {
+    const { stdout } = await executeOperation(ctx, "add_frames", {
+      inputPath: args.inputPath,
+      count: args.count,
+      duration: args.duration,
+      outputPath: args.outputPath,
+    });
+
+    return { content: [{ type: "text", text: stdout }] };
+  } catch (error: any) {
+    return createErrorResponse(
+      `Failed to add frames: ${error?.message ?? "Unknown error"}`,
+      ["Ensure the sprite file exists"],
+    );
+  }
+}
+
+export async function handleSetFrameDurations(
+  ctx: ServerContext,
+  args: any,
+): Promise<ToolResponse> {
+  args = normalizeParameters(args);
+
+  if (!args.inputPath) {
+    return createErrorResponse("Missing required parameter: inputPath", [
+      "Provide the absolute path to the sprite file",
+    ]);
+  }
+
+  if (!args.durations || typeof args.durations !== "object") {
+    return createErrorResponse("Missing required parameter: durations", [
+      'Provide an object mapping frame numbers to durations, e.g. {"1": 0.2, "2": 0.1}',
+    ]);
+  }
+
+  if (!validatePath(args.inputPath)) {
+    return createErrorResponse("Invalid path", [
+      'Provide a valid path without ".."',
+    ]);
+  }
+
+  try {
+    const { stdout } = await executeOperation(ctx, "set_frame_durations", {
+      inputPath: args.inputPath,
+      durations: args.durations,
+      outputPath: args.outputPath,
+    });
+
+    return { content: [{ type: "text", text: stdout }] };
+  } catch (error: any) {
+    return createErrorResponse(
+      `Failed to set frame durations: ${error?.message ?? "Unknown error"}`,
+      ["Ensure the frame numbers are valid"],
+    );
+  }
+}

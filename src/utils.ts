@@ -49,6 +49,9 @@ export const PARAMETER_MAPPINGS: Record<string, string> = {
   max_colors: "maxColors",
   keep_rgb: "keepRgb",
   palette_start: "paletteStart",
+  // Round 7 — Pixel Reading, Polygon, Bulk Frames, Cel Movement
+  offset_x: "offsetX",
+  offset_y: "offsetY",
 };
 
 export const REVERSE_PARAMETER_MAPPINGS: Record<string, string> = {};

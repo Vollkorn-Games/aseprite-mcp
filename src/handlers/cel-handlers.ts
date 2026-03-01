@@ -124,3 +124,47 @@ export async function handleCopyCel(
     );
   }
 }
+
+export async function handleMoveCel(
+  ctx: ServerContext,
+  args: any,
+): Promise<ToolResponse> {
+  args = normalizeParameters(args);
+
+  if (!args.inputPath) {
+    return createErrorResponse("Missing required parameter: inputPath", [
+      "Provide the absolute path to the sprite file",
+    ]);
+  }
+
+  if (args.offsetX == null && args.offsetY == null) {
+    return createErrorResponse(
+      "At least one of offsetX or offsetY is required",
+      ["Provide offsetX and/or offsetY to move the cel"],
+    );
+  }
+
+  if (!validatePath(args.inputPath)) {
+    return createErrorResponse("Invalid path", [
+      'Provide a valid path without ".."',
+    ]);
+  }
+
+  try {
+    const { stdout } = await executeOperation(ctx, "move_cel", {
+      inputPath: args.inputPath,
+      offsetX: args.offsetX ?? 0,
+      offsetY: args.offsetY ?? 0,
+      frameNumber: args.frameNumber,
+      layerIndex: args.layerIndex,
+      outputPath: args.outputPath,
+    });
+
+    return { content: [{ type: "text", text: stdout }] };
+  } catch (error: any) {
+    return createErrorResponse(
+      `Failed to move cel: ${error?.message ?? "Unknown error"}`,
+      ["Ensure a cel exists at the specified frame/layer"],
+    );
+  }
+}

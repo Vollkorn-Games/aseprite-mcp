@@ -60,7 +60,7 @@ Aseprite is auto-detected from common install locations (Steam, `/usr/bin`, `/Ap
 | `MCP_EXCLUDE_TOOLS` | Comma-separated list of tool names to exclude     |
 | `MCP_READ_ONLY`     | Set to `true` to expose only read-only tools      |
 
-## 59 Tools Across 14 Categories
+## 65 Tools Across 14 Categories
 
 ### Sprite Management (5 tools)
 
@@ -82,18 +82,20 @@ Aseprite is auto-detected from common install locations (Steam, `/usr/bin`, `/Ap
 | `list_layers`          | List all layers with metadata             |
 | `flatten_layers`       | Flatten all layers into one               |
 
-### Frame & Animation (6 tools)
+### Frame & Animation (8 tools)
 
-| Tool                 | Description                        |
-| -------------------- | ---------------------------------- |
-| `add_frame`          | Add new frame (empty or duplicate) |
-| `remove_frame`       | Remove frame by number             |
-| `set_frame_duration` | Set frame duration in seconds      |
-| `list_frames`        | List all frames with durations     |
-| `reorder_frames`     | Reverse frame order within a range |
-| `duplicate_frame`    | Clone a frame with all cel content |
+| Tool                  | Description                            |
+| --------------------- | -------------------------------------- |
+| `add_frame`           | Add new frame (empty or duplicate)     |
+| `remove_frame`        | Remove frame by number                 |
+| `set_frame_duration`  | Set frame duration in seconds          |
+| `list_frames`         | List all frames with durations         |
+| `reorder_frames`      | Reverse frame order within a range     |
+| `duplicate_frame`     | Clone a frame with all cel content     |
+| `add_frames`          | Bulk add multiple empty frames at once |
+| `set_frame_durations` | Set durations for multiple frames      |
 
-### Drawing Operations (10 tools)
+### Drawing Operations (13 tools)
 
 | Tool            | Description                                  |
 | --------------- | -------------------------------------------- |
@@ -107,6 +109,9 @@ Aseprite is auto-detected from common install locations (Steam, `/usr/bin`, `/Ap
 | `draw_circle`   | Draw circle (filled or outline)              |
 | `replace_color` | Replace all pixels of one color with another |
 | `outline`       | Add outline around non-transparent pixels    |
+| `get_pixels`    | Read pixel colors from a canvas region       |
+| `draw_polygon`  | Draw polygon (filled or outline) from points |
+| `get_canvas`    | Dump full canvas as 2D hex color grid        |
 
 ### Palette Management (5 tools)
 
@@ -153,13 +158,14 @@ Aseprite is auto-detected from common install locations (Steam, `/usr/bin`, `/Ap
 | `export_spritesheet` | Generate sprite sheet with JSON metadata |
 | `export_gif`         | Export as animated GIF                   |
 
-### Cel Operations (3 tools)
+### Cel Operations (4 tools)
 
 | Tool           | Description                            |
 | -------------- | -------------------------------------- |
 | `clear_cel`    | Clear cel content                      |
 | `get_cel_info` | Get cel position, opacity, bounds      |
 | `copy_cel`     | Copy cel content between frames/layers |
+| `move_cel`     | Move/translate cel content by offset   |
 
 ### Tileset & Tilemap (3 tools)
 

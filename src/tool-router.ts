@@ -46,6 +46,8 @@ const HANDLER_MAP: Record<string, HandlerFn> = {
   list_frames: frameHandlers.handleListFrames,
   reorder_frames: frameHandlers.handleReorderFrames,
   duplicate_frame: frameHandlers.handleDuplicateFrame,
+  add_frames: frameHandlers.handleAddFrames,
+  set_frame_durations: frameHandlers.handleSetFrameDurations,
 
   // Drawing operations
   draw_pixel: drawingHandlers.handleDrawPixel,
@@ -58,6 +60,9 @@ const HANDLER_MAP: Record<string, HandlerFn> = {
   draw_circle: drawingHandlers.handleDrawCircle,
   replace_color: drawingHandlers.handleReplaceColor,
   outline: drawingHandlers.handleOutline,
+  get_pixels: drawingHandlers.handleGetPixels,
+  draw_polygon: drawingHandlers.handleDrawPolygon,
+  get_canvas: drawingHandlers.handleGetCanvas,
 
   // Palette management
   get_palette: paletteHandlers.handleGetPalette,
@@ -93,6 +98,7 @@ const HANDLER_MAP: Record<string, HandlerFn> = {
   clear_cel: celHandlers.handleClearCel,
   get_cel_info: celHandlers.handleGetCelInfo,
   copy_cel: celHandlers.handleCopyCel,
+  move_cel: celHandlers.handleMoveCel,
 
   // Tilemap operations
   create_tilemap_layer: tilemapHandlers.handleCreateTilemapLayer,
